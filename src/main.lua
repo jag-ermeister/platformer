@@ -169,7 +169,6 @@ function player_update()
       player.dx=0
     end
   elseif player.dx>0 then
-
     player.dx=limit_speed(player.dx,player.max_dx)
 
     if collide_map(player,"right",1) then
@@ -199,5 +198,5 @@ function _draw()
   palt(0, false)
   palt(12, true)
   map(0,0)
-  spr(player.sp, player.x, player.y)
+  spr(player.sp, player.x, player.y, 1, 1, player.flp)
 end

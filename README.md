@@ -1,7 +1,7 @@
 ### TODO
 --------
 - Clone the first level of Mario
-
+- https://nerdyteachers.com/Explain/Platformer/
 
 ### steps
 ---------
@@ -12,4 +12,7 @@
     - reset player to old position if colliding with solid map
 - add better movement
     - physics
+    - check map collision in player_update for more granular handling of collision situations
+    - physics
+- player animation
 - camera control

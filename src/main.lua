@@ -9,8 +9,8 @@ function _init()
     h = 8,
     dx = 0,
     dy = 0,
-    max_dx = 2,
-    max_dy = 3,
+    max_dx = 2, -- max sprinting speed
+    max_dy = 3, --terminal velocity
     acc = 0.5, -- horizontal acceleration
     boost = 4, -- vertical acceleration
     anim = 0,
@@ -18,49 +18,155 @@ function _init()
     jumping = false,
     falling = false,
     sliding = false,
-    landed = false
+    landed = false,
+    flp = false
   }
+  gravity = 0.3
+  friction = 0.85
 end
   
 function _update()
   player.old_x = player.x
   player.old_y = player.y
-  
-  if btn(0) then --left
-    player.x -=1
-  end
-  if btn(1) then --right
-    player.x +=1
-  end
-  if btn(2) then --up
-    player.y -=1
-  end
-  if btn(3) then --down
-    player.y +=1
-  end
 
-  if map_collide(player) then
-    player.x = player.old_x
-    player.y = player.old_y
-  end
+  player_update()
+
+  -- if map_collide(player) then
+  --   player.x = player.old_x
+  --   player.y = player.old_y
+  --   printh("assigning old position")
+  -- end
 end
 
-function map_collide(obj)
-  --mget gives us the sprite assigned to a cell on the map
-  -- must convert pixel to cell
-  s1 = mget(obj.x / obj.w, obj.y / obj.h)
-  s2 = mget((obj.x + obj.w - 1) / obj.w, obj.y / obj.h)
-  s3 = mget(obj.x / obj.w, (obj.y + obj.w - 1) / obj.h)
-  s4 = mget((obj.x + obj.w - 1) / obj.w, (obj.y + obj.w - 1) / obj.h)
-  
-  if fget(s1, 0)
-  or fget(s2, 0)
-  or fget (s3, 0)
-  or fget (s4, 0) then
+function limit_speed(num,maximum)
+  return mid(-maximum,num,maximum)
+end
+
+function collide_map(obj,aim,flag)
+  --obj = table needs x,y,w,h
+  --aim = left,right,up,down
+ 
+  local x=obj.x  local y=obj.y
+  local w=obj.w  local h=obj.h
+ 
+  local x1=0	 local y1=0
+  local x2=0  local y2=0
+ 
+  if aim=="left" then
+    x1=x-1  y1=y
+    x2=x    y2=y+h-1
+ 
+  elseif aim=="right" then
+    x1=x+w-1    y1=y
+    x2=x+w  y2=y+h-1
+ 
+  elseif aim=="up" then
+    x1=x+2    y1=y-1
+    x2=x+w-3  y2=y
+ 
+  elseif aim=="down" then
+    x1=x+2      y1=y+h
+    x2=x+w-3    y2=y+h
+  end
+ 
+  --pixels to tiles
+  x1/=8    y1/=8
+  x2/=8    y2/=8
+ 
+  if fget(mget(x1,y1), flag)
+  or fget(mget(x1,y2), flag)
+  or fget(mget(x2,y1), flag)
+  or fget(mget(x2,y2), flag) then
     return true
   else
     return false
   end
+ 
+ end
+
+function player_update()
+  --physics
+  player.dy+=gravity
+  player.dx*=friction
+
+  --controls
+  if btn(⬅️) then
+    player.dx-=player.acc
+    player.running=true
+    player.flp=true
+  end
+  if btn(➡️) then
+    player.dx+=player.acc
+    player.running=true
+    player.flp=false
+  end
+
+  --slide
+  if player.running
+  and not btn(⬅️)
+  and not btn(➡️)
+  and not player.falling
+  and not player.jumping then
+    player.running=false
+    player.sliding=true
+  end
+
+  --jump
+  if btnp(❎)
+  and player.landed then
+    player.dy-=player.boost
+    player.landed=false
+  end
+
+  --check collision up and down
+  if player.dy>0 then
+    player.falling=true
+    player.landed=false
+    player.jumping=false
+
+    player.dy=limit_speed(player.dy,player.max_dy)
+
+    if collide_map(player,"down",0) then
+      player.landed=true
+      player.falling=false
+      player.dy=0
+      player.y-=((player.y+player.h+1)%8)-1
+    end
+  elseif player.dy<0 then
+    player.jumping=true
+    if collide_map(player,"up",1) then
+      player.dy=0
+    end
+  end
+
+  --check collision left and right
+  if player.dx<0 then
+
+    player.dx=limit_speed(player.dx,player.max_dx)
+
+    if collide_map(player,"left",1) then
+      player.dx=0
+    end
+  elseif player.dx>0 then
+
+    player.dx=limit_speed(player.dx,player.max_dx)
+
+    if collide_map(player,"right",1) then
+      player.dx=0
+    end
+  end
+
+  --stop sliding
+  if player.sliding then
+    if abs(player.dx)<.2
+    or player.running then
+      player.dx=0
+      player.sliding=false
+    end
+  end
+
+  player.x+=player.dx
+  player.y+=player.dy
 end
  
 function _draw()

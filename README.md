@@ -7,6 +7,8 @@
 ---------
 - simple movement (move everywhere, no gravity)
 - simple map collision
+    - going with hit box on up/down/left/right of player
+    - advanced movement will depend on this map collision
     - mark map tiles that should be solid
     - detect if player sprite is overlapping a solid map tile
     - reset player to old position if colliding with solid map

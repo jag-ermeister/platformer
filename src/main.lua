@@ -30,12 +30,7 @@ function _update()
   player.old_y = player.y
 
   player_update()
-
-  -- if map_collide(player) then
-  --   player.x = player.old_x
-  --   player.y = player.old_y
-  --   printh("assigning old position")
-  -- end
+  player_animate()
 end
 
 function limit_speed(num,maximum)
@@ -81,8 +76,34 @@ function collide_map(obj,aim,flag)
   else
     return false
   end
- 
- end
+end
+
+function player_animate()
+  if player.jumping then
+    printh("jumping!")
+    player.sp=7
+  elseif player.falling then
+    player.sp=8
+  elseif player.sliding then
+    player.sp=9
+  elseif player.running then
+    if time()-player.anim>.1 then
+      player.anim=time()
+      player.sp+=1
+      if player.sp>6 then
+        player.sp=3
+      end
+    end
+  else --player idle
+    if time()-player.anim>.3 then
+      player.anim=time()
+      player.sp+=1
+      if player.sp>2 then
+        player.sp=1
+      end
+    end
+  end
+end
 
 function player_update()
   --physics
@@ -178,5 +199,5 @@ function _draw()
   palt(0, false)
   palt(12, true)
   map(0,0)
-  spr(1, player.x, player.y)
+  spr(player.sp, player.x, player.y)
 end

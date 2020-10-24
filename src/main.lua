@@ -21,7 +21,7 @@ function _init()
     landed = false,
     flp = false
   }
-  gravity = 0.3
+  gravity = 0.2
   friction = 0.85
 end
   

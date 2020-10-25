@@ -31,6 +31,8 @@ function _update()
 
   player_update()
   player_animate()
+
+  camera(player.x - 64, 0)
 end
 
 function _draw()

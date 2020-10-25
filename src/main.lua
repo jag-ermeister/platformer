@@ -23,6 +23,8 @@ function _init()
   }
   gravity = 0.2
   friction = 0.85
+
+  camera_init()
 end
   
 function _update()
@@ -32,7 +34,7 @@ function _update()
   player_update()
   player_animate()
 
-  camera(player.x - 64, 0)
+  camera_update()
 end
 
 function _draw()

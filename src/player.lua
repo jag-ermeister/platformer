@@ -84,7 +84,6 @@ end
 
 function player_animate()
   if player.jumping then
-    printh("jumping!")
     player.sp=7
   elseif player.falling then
     player.sp=8

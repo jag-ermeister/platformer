@@ -18,3 +18,4 @@
     - physics
 - player animation
 - camera control
+    - only really worried about x-axis movement
